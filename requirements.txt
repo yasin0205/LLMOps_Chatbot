@@ -13,3 +13,4 @@ langfuse
 dagshub
 guardrails-ai
 fastapi
+deepeval
