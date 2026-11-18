@@ -50,7 +50,7 @@ def load_and_clean_transcripts(original_dir: Path | str,
 
     # Find all .txt files directly inside the original folder (not in subfolders)
     # glob returns a generator, so files are found as the loop runs
-    transcripts = ORIGINAL_PATH.glob("*.txt")  # go through all the transcript .txt files
+    transcripts = ORIGINAL_PATH.glob("*.txt") 
     for transcript_path in transcripts:
         # read the content of the transcript file
         file_content = transcript_path.read_text(encoding='utf-8')
