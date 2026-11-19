@@ -265,3 +265,4 @@ desktop.ini
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea/
+.deepeval
