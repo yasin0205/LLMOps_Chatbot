@@ -53,7 +53,7 @@ from pathlib import Path
 from logging import getLogger, StreamHandler, Formatter, INFO
 # the compiled LangGraph app from your project: the same graph you built in the notebook
 # (retrieve -> augmentation -> generation). Importing it must not rebuild or re-add the vector store.
-from rag_workflow import graph
+from app.rag_workflow import graph
 # your own config object: it holds all the numbers/settings in one place (not part of DeepEval)
 #from config.parameter_config import params_config
 
@@ -78,35 +78,37 @@ def generate_evaluation_dataset():
     # getLogger(name) -> a logger with this name. The same name always returns the SAME logger object,
     #                    so running this function twice in one session adds a second handler
     #                    and every message prints twice (restart the kernel, or check logger.handlers first).
-    logger = getLogger(name="Dataset Logger")
+    #logger = getLogger(name="Dataset Logger")
     # add stream handler
     # A handler decides WHERE messages go. StreamHandler() prints to the screen (stderr by default).
     # Other choices: StreamHandler(sys.stdout) to print to stdout,
     #                FileHandler("dataset.log") to write to a file.
-    handler = StreamHandler()
-    logger.addHandler(handler)
+    #handler = StreamHandler()
+    #logger.addHandler(handler)
     # setLevel -> the lowest level that is shown. Levels from low to high:
     #             DEBUG < INFO < WARNING < ERROR < CRITICAL. Messages below the level are hidden.
-    logger.setLevel(INFO)
+    #logger.setLevel(INFO)
     # add formatter
     # fmt placeholders: %(asctime)s time, %(name)s logger name, %(levelname)s level, %(message)s the text.
     # Others you can use: %(filename)s, %(lineno)d. Extra argument: datefmt="%H:%M:%S" for a shorter time.
-    formatter = Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    handler.setFormatter(fmt=formatter)
+    #formatter = Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    #handler.setFormatter(fmt=formatter)
 
     # create paths
     # __file__ = this script's path. .resolve() makes it absolute.
     # .parent = go up one folder. Three .parent in a row means three folders up.
     # With the file at <root>/src/<folder>/generate_eval_dataset.py, three parents up is <root>.
     # If you move the file to a different depth, ROOT_DIR points to the wrong place.
-    ROOT_DIR = Path(__file__).parent
+    # If you move the file to a different depth, ROOT_PATH points to the wrong place.
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+
 
     # the goldens file (the input), saved earlier by generate_goldens.py.
     # .with_suffix(".json") -> sets the extension to .json (it REPLACES any existing extension,
     # so a file name that contains a dot, like "golden_v1.0", would be cut to "golden_v1.json").
-    GOLDENS_PATH = (ROOT_DIR / "datasets" / "golden.json")
+    GOLDENS_PATH = (ROOT_DIR / "data" / "evaluation" / "goldens" / "golden.json")
     # the folder where the test cases file will be saved (the output)
-    EVALUATION_DATA_DIR = ROOT_DIR / "datasets" / "eval_dataset"
+    EVALUATION_DATA_DIR = ROOT_DIR / "data" / "evaluation" / "eval_dataset"
 
     # create dir
     # exist_ok=True -> no error if it already exists; parents=True -> create missing parent folders too
@@ -137,7 +139,7 @@ def generate_evaluation_dataset():
 
     # golden_dataset.goldens = the list of loaded goldens.
     # enumerate(list, 1) -> gives (count, item) pairs, counting from 1 (so the log says "no. 1", not "no. 0").
-    for count, golden in enumerate(golden_dataset.goldens, 1):
+    for golden in golden_dataset.goldens:
         # Run the whole RAG graph once, with the golden question as the "query" input.
         # The key "query" must match the field name in RAGState from the notebook.
         # final_state is the full state dict: query, retrieved_docs, context, prompt, response.
@@ -170,7 +172,7 @@ def generate_evaluation_dataset():
         eval_dataset.add_test_case(test_case=test_case)
         # progress message, printed through the logger set up above
         # (logger.log(level=INFO, msg=...) does the same as logger.info(...))
-        logger.log(level=INFO, msg=f"Added test case no. {count}")
+        #logger.log(level=INFO, msg=f"Added test case no. {count}")
 
 
     # =================================================================

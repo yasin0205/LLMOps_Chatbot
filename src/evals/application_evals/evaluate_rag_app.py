@@ -198,32 +198,6 @@ answer_correctness = GEval(
         "its absence from 'Actual Output' — including an explicit 'I don't know' or 'the "
         "context does not say' about it — is never an omission or an error and must not "
         "lower the score.",
-        "'Retrieval Context' outranks 'Expected Output' as the standard for the primary "
-        "answer. If 'Expected Output' frames the central cause / mechanism / answer in a "
-        "way that 'Retrieval Context' does not actually support, judge 'Actual Output' "
-        "against the retrieval-supported framing instead. An 'Actual Output' statement "
-        "that is faithful to 'Retrieval Context' but conflicts only with an unsupported "
-        "generalisation in 'Expected Output' is at most a minor secondary imprecision "
-        "(7-8 band), never a contradiction.",
-        "For each key fact, check whether 'Actual Output' conveys it, contradicts it "
-        "(opposite claim, wrong name or number, reversed cause and effect), or omits it.",
-        "Judge contradictions against BOTH 'Expected Output' and 'Retrieval Context'. If "
-        "'Actual Output' diverges from a nuance in 'Expected Output' but stays consistent "
-        "with 'Retrieval Context', that is NOT a contradiction and must not lower the "
-        "score.",
-        "Extra claims in 'Actual Output' that go beyond 'Expected Output' count against it "
-        "ONLY if they contradict 'Retrieval Context' or 'Expected Output', or are clearly "
-        "false. Extra detail that is grounded in 'Retrieval Context', OR merely plausible "
-        "and uncontradicted, is NOT an error: it must not lower the score and must not cap "
-        "it below the top band, no matter how much of it there is or how loosely grounded "
-        "it is.",
-        "Do not penalise differences in wording, ordering, formatting, length, or "
-        "structure (prose vs JSON vs bullets).",
-        "Rank issues by severity: contradicting a key fact is most serious; failing to "
-        "convey a key fact that answers the PRIMARY question is next; omitting or slightly "
-        "misstating a secondary retrieval-supported detail is minor and belongs in the "
-        "7-8 band, not lower; extra detail and anything not supported by 'Retrieval "
-        "Context' are not issues at all.",
         "Pick the rubric band for the most severe real issue found; within that band, "
         "score at the top when the rest of the answer is accurate.",
     ],
@@ -265,27 +239,6 @@ simple_explanation = GEval(
         "'Actual Output' as an LLMOps student: someone taking a course on building and "
         "operating LLM applications, comfortable with everyday AI/software vocabulary but "
         "new to fine detail.",
-        "Find the OPAQUE JARGON in 'Actual Output': terms an LLMOps student would still "
-        "not understand. The following do NOT count as opaque jargon and must not lower "
-        "the score: (a) any term already used in 'Input'; (b) ordinary English words and "
-        "descriptive phrases even if slightly domain-flavoured (e.g. 'content team', "
-        "'recorded courses', 'complementary', 'remediation', 'auto-fixing', 'cyber "
-        "partners'); (c) standard AI/RAG-pipeline vocabulary this audience already knows "
-        "(e.g. 'model', 'prompt', 'system prompt', 'probabilistic', 'deterministic', "
-        "'retrieval', 'retriever', 'RAG', 'embedding'/'embedder', 're-ranker', 'vector "
-        "store', 'chunking', 'NLU', 'token', 'latency', 'training data'); (d) proper "
-        "nouns / product names, which need no definition.",
-        "For each piece of opaque jargon, check whether it is avoided, replaced with plain "
-        "language, or made clear in-line or from surrounding context (an example, an "
-        "appositive, a parenthetical) the first time it is used. An acronym or term whose "
-        "meaning is clear from context counts as handled.",
-        "Judge structure: short sentences, headings, bullet lists, concrete examples, and "
-        "clear step-by-step breakdowns make it accessible; long nested sentences and "
-        "unbroken dense paragraphs make it less accessible. An analogy is a bonus, never a "
-        "requirement.",
-        "Judge only readability and accessibility, not factual accuracy (that is scored "
-        "separately). The one exception: do not reward simplicity achieved by omitting "
-        "parts of what 'Input' asked for.",
         "Decide how much effort an LLMOps student needs to follow 'Actual Output' from "
         "start to finish, and pick the matching band.",
     ],
@@ -311,10 +264,10 @@ def evaluate_app():
     # so this file sits one folder deeper than they do. ROOT_DIR must end up at your project root,
     # because both the input (data/...) and the output (reports/...) are built from it.
     # If a folder is created in the wrong place, check this number of .parent.
-    ROOT_DIR = Path(__file__).resolve().parent
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
     # the test cases file (the input), saved earlier by generate_eval_dataset.py.
     # .with_suffix(".json") -> sets the extension to .json (it REPLACES any existing extension)
-    DATASET_PATH = (ROOT_DIR / "datasets" / "eval_dataset" / "evaluation_dataset.json")
+    DATASET_PATH = (ROOT_DIR / "data" / "evaluation" / "eval_dataset" / "evaluation_dataset.json")
 
     # Only run if the file exists.
     # NOTE: there is no else branch, so a missing file means the script ends WITHOUT any message.
@@ -388,11 +341,11 @@ def evaluate_app():
                         contextual_relevancy,
                         answer_correctness,
                         simple_explanation],
-                async_config=AsyncConfig(throttle_value=3,
-                                        max_concurrent=5),
-                display_config=DisplayConfig(results_folder=(ROOT_DIR / "evaluation_results").as_posix(),
-                                            #file_type="md",
-                                            file_output_dir=(ROOT_DIR / "evaluation_reports").as_posix())
+                async_config=AsyncConfig(),
+                display_config=DisplayConfig(results_folder=(ROOT_DIR / "reports" / "evaluation_results").as_posix(),
+                                            file_type="md",
+                                            file_output_dir=(ROOT_DIR / "reports" / "evaluation_reports").as_posix())
+                                            
         )
 
 

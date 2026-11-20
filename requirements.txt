@@ -14,3 +14,4 @@ dagshub
 guardrails-ai
 fastapi
 deepeval
+portalocker

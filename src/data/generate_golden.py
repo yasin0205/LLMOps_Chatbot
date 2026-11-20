@@ -66,6 +66,11 @@ from pathlib import Path
 #  existing variables, verbose=True to warn when no .env is found)
 load_dotenv()
 
+
+
+
+
+
 def generate_golden_dataset():
 
     # =================================================================
@@ -77,11 +82,11 @@ def generate_golden_dataset():
     # .parent = go up one folder. Three .parent in a row means three folders up.
     # With the file at <root>/src/<folder>/generate_goldens.py, three parents up is <root>.
     # If you move the file to a different depth, ROOT_PATH points to the wrong place.
-    ROOT_PATH = Path(__file__).resolve().parent
+    ROOT_PATH = Path(__file__).resolve().parent.parent.parent
     # the folder with your cleaned .txt documents (the input)
-    DOCS_PATH = ROOT_PATH / "cleaned-transcripts"
+    DOCS_PATH = ROOT_PATH / "data" / "processed"
     # the folder where the goldens file will be saved (the output)
-    GOLDENS_DIR = ROOT_PATH / "datasets"
+    GOLDENS_DIR = ROOT_PATH / "data" / "evaluation" / "goldens"
 
     # create the directory
     # exist_ok=True -> no error if it already exists; parents=True -> create missing parent folders too
@@ -131,7 +136,7 @@ def generate_golden_dataset():
     #   encoding=...                     -> the tokenizer used to count chunk_size tokens
     context_config = ContextConstructionConfig(
         critic_model="gpt-5-nano",
-        max_contexts_per_document=2,
+        max_contexts_per_document=1,
         context_quality_threshold=0.5,
         max_retries=2,
         chunk_size=200,
@@ -225,7 +230,7 @@ def generate_golden_dataset():
     
     goldens = synthesizer.generate_goldens_from_docs(
         document_paths=get_docs_path(DOCS_PATH),
-        max_goldens_per_context=3,
+        max_goldens_per_context=2,
         context_construction_config=context_config)
     # (the `goldens` variable is not used below: save_as saves the goldens the synthesizer
     #  stored internally, so the code works the same without it)
