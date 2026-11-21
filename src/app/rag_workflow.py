@@ -330,6 +330,7 @@ retriever = vs.as_retriever(search_type="similarity", search_kwargs={"k":3})
 # StateGraph -> the builder: you give it the state class, then add_node(...), add_edge(...), compile()
 # START      -> a marker for "the entry point" (add_edge(START, "first_node"))
 # END        -> a marker for "the exit point" (add_edge("last_node", END))
+import langfuse
 from langgraph.graph import StateGraph, START, END
 
 # TypedDict -> describes a dict with fixed keys and value types. Used for RAGState (the clipboard).
@@ -405,6 +406,12 @@ def retrieve(state: RAGState) -> dict:
 
 # ---- Node 2: Augmentation ----
 
+langfuse = langfuse.get_client()
+system_prompt = langfuse.get_prompt(
+    name="rag_app_system_prompt",
+    type="text",
+    label="staging"
+)
 def augmentation(state: RAGState) -> dict:
 
     # from_messages takes a list of (role, text) pairs.
@@ -415,9 +422,7 @@ def augmentation(state: RAGState) -> dict:
     #                MessagesPlaceholder("history") to insert earlier chat messages.
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are a helpful assistant. Answer the user query
-                      based on the given context only. If you do not know the answer
-                      say I don't know. Do not add any preamble to the response"""),
+        ("system", system_prompt.prompt),
         ("human", "context: {context}\n\nquery: {query}")
     ])
     # ("based on the context only" keeps the model from using its own knowledge, which reduces hallucination.
