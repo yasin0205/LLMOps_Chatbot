@@ -15,3 +15,4 @@ guardrails-ai
 fastapi
 deepeval
 portalocker
+mlflow
